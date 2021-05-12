@@ -4,18 +4,19 @@ import numpy as np
 import probnum.diffeq as pnd
 import probnum.diffeq.odefiltsmooth.kalman_odesolution as odesol
 import probnum.randvars as pnrv
-from probnum import filtsmooth, problems, statespace
+from probnum import filtsmooth, problems, statespace, utils
 from probnum.diffeq.perturbedsolvers import perturbedstatesolution
 from probnum.statespace import discrete_transition
 
 
-class NoisyStateSolver(pnd.ODESolver):
-    """ODE Solver based on Scipy that introduces uncertainty by adding Gaussian-noise
+class PerturbedStateSolver(pnd.ODESolver):
+    """ODE Solver based on SciPy that introduces uncertainty by adding Gaussian-noise
     with error-estimation dependant variance."""
 
-    def __init__(self, solver, noise_scale):
+    def __init__(self, solver, noise_scale, random_state=None):
         self.solver = solver
-        self.noise_scale = noise_scale
+        self.noise_scale = (noise_scale,)
+        self.random_state = (utils.as_random_state(random_state),)
         self.perturbation = None
         self.interpolants = None
         self.kalman_odesolutions = None
@@ -103,7 +104,7 @@ class NoisyStateSolver(pnd.ODESolver):
         )
         times = np.asarray([0, time])
         regression_problem = problems.RegressionProblem(states, times)
-        kalman_posterior = self.gauss_filter.filtsmooth(regression_problem)
+        kalman_posterior, _ = self.gauss_filter.filtsmooth(regression_problem)
         kalman_ode_solution = odesol.KalmanODESolution(kalman_posterior)
         return unperturbed_dense_output, kalman_ode_solution
 

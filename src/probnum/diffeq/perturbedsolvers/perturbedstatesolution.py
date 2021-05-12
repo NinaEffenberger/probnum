@@ -57,7 +57,7 @@ class PerturbedStateSolution(pnd.ODESolution):
         regression_problem = problems.RegressionProblem(
             ys_perturbation_new, ts_perturbation_new
         )
-        filtpost = self.kalman.filtsmooth(regression_problem)
+        filtpost, _ = self.kalman.filtsmooth(regression_problem)
         self.kalman_odesolutions[closest_left_t] = kalman_odesolution.KalmanODESolution(
             filtpost
         )
