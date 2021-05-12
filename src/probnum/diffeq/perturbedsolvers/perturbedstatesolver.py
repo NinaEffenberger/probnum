@@ -13,7 +13,6 @@ class NoisyStateSolver(pnd.ODESolver):
     """ODE Solver based on Scipy that introduces uncertainty by adding Gaussian-noise
     with error-estimation dependant variance."""
 
-    # pylint: disable=maybe-no-member
     def __init__(self, solver, noise_scale):
         self.solver = solver
         self.noise_scale = noise_scale
@@ -97,7 +96,6 @@ class NoisyStateSolver(pnd.ODESolver):
             represents the perturbation
         """
         unperturbed_dense_output = self.solver.dense_output()
-        # calculate kalman posterior of the perturbations
         noise = self.perturbation[-1]
         time = self.stepsize
         states = np.asarray(

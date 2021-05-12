@@ -25,11 +25,10 @@ class PerturbedStateSolution(pnd.ODESolution):
     """
 
     def __init__(self, times, states, interpolants, kalman_odesolutions, gauss_filter):
-        self.times = times
-        self.states = states
         self.interpolants = interpolants
         self.kalman_odesolutions = kalman_odesolutions
         self.kalman = gauss_filter
+        super().__init__(locations=times, states=states)
 
     def __call__(self, t):
         if not np.isscalar(t):
