@@ -37,9 +37,9 @@ class PerturbedStateSolution(pnd.ODESolution):
                 [self.__call__(t_pt) for t_pt in np.asarray(t)]
             )
         # find closest timepoint (=í.e. correct interpolant) of evaluation
-        closest_left_t = self.find_closest_left_element(self.times, t)
+        closest_left_t = self.find_closest_left_element(self.locations, t)
         # timepoint within the given interpolant
-        interpolant_t = t - self.times[closest_left_t]
+        interpolant_t = t - self.locations[closest_left_t]
         interpolant = self.interpolants[closest_left_t]
         # evalution at timepoint t, not the interpolants' timepoint
         scipy_dense = interpolant(t)
@@ -67,7 +67,7 @@ class PerturbedStateSolution(pnd.ODESolution):
     @property
     def t(self):
         """Time points of the discrete-time solution."""
-        return self.times
+        return self.locations
 
     @property
     def y(self):

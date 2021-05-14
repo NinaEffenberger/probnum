@@ -1,7 +1,6 @@
 import numpy as np
 import pytest
 import pytest_cases
-from pytest_cases.fixture_core2 import fixture
 from scipy.integrate._ivp import base, rk
 
 from probnum import diffeq, randvars
