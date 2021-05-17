@@ -1,13 +1,13 @@
+from typing import Optional
+
 import numpy as np
 
-import probnum._randomvariablelist as pnrv_list
-import probnum.diffeq as pnd
-import probnum.randvars as pnrv
-from probnum import problems
+from probnum import _randomvariablelist, diffeq, problems, randvars
 from probnum.diffeq.odefiltsmooth import kalman_odesolution
+from probnum.type import FloatArgType
 
 
-class PerturbedStateSolution(pnd.ODESolution):
+class PerturbedStateSolution(diffeq.ODESolution):
 
     """Output of NoisyStateSolver.
 
@@ -30,10 +30,21 @@ class PerturbedStateSolution(pnd.ODESolution):
         self.kalman = gauss_filter
         super().__init__(locations=times, states=states)
 
+    """
+    def interpolate(
+        self,
+        t: FloatArgType,
+        previous_location: Optional[FloatArgType],
+        previous_state: Optional[randvars.RandomVariable],
+        next_location: Optional[FloatArgType],
+        next_state: Optional[randvars.RandomVariable],
+    ):
+    """
+
     def __call__(self, t):
         if not np.isscalar(t):
             # recursive evaluation (t can now be any array, not just length 1!)
-            return pnrv_list._RandomVariableList(
+            return _randomvariablelist._RandomVariableList(
                 [self.__call__(t_pt) for t_pt in np.asarray(t)]
             )
         # find closest timepoint (=í.e. correct interpolant) of evaluation
@@ -62,29 +73,11 @@ class PerturbedStateSolution(pnd.ODESolution):
             filtpost
         )
         output = scipy_dense + noise_dense
-        return pnrv.Constant(output[0])
-
-    @property
-    def t(self):
-        """Time points of the discrete-time solution."""
-        return self.locations
-
-    @property
-    def y(self):
-        """Discrete-time solution."""
-        return pnrv_list._RandomVariableList(self.states)
-
-    def __len__(self) -> int:
-        """Number of points in the discrete-time solution."""
-        return len(self.states)
-
-    def __getitem__(self, idx: int) -> pnrv.RandomVariable:
-        """Access the :math:`i`th element of the discrete-time solution."""
-        return self.states[idx]
+        return randvars.Constant(output[0])
 
     def find_closest_left_element(self, times, t_new):
-        """
 
+        """
         Parameters
         ----------
         times : array
@@ -97,8 +90,8 @@ class PerturbedStateSolution(pnd.ODESolution):
         -------
         closest left timepoint of t in times, , i.e. if t_i < t_new < t_{i+1}
         the output it t_i. For t_n return t_{n-1}.
-
         """
+
         # find closest timepoint of evaluation
         closest_t = (np.abs(t_new - np.array(times))).argmin()
         # if t_new is in the first interpolant
@@ -129,8 +122,8 @@ class PerturbedStateSolution(pnd.ODESolution):
         Returns
         -------
         states and times with updated timestep and corresponding state respectively
-
         """
+
         closest_position = (np.abs(t_new - np.array(times))).argmin()
         if times[closest_position] != t_new:
             if t_new > times[closest_position]:

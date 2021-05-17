@@ -116,10 +116,8 @@ class PerturbedStateSolver(pnd.ODESolver):
         self.kalman_odesolutions.append(dense[1])
 
     def rvlist_to_odesol(self, times, rvs):
-        interpolants = self.interpolants
-        kalman_odesolutions = self.kalman_odesolutions
         probnum_solution = perturbedstatesolution.PerturbedStateSolution(
-            times, rvs, interpolants, kalman_odesolutions, self.gauss_filter
+            times, rvs, self.interpolants, self.kalman_odesolutions, self.gauss_filter
         )
         return probnum_solution
 

@@ -30,8 +30,8 @@ def test_call(
 ):  # Test for continuity of the dense output. Small changes of the locations should
     # come with small changes of the states.
     np.testing.assert_allclose(
-        solutionnoisy(solutionnoisy.locations[1:]).mean,
-        solutionnoisy.states[1:].mean,
+        solutionnoisy(solutionnoisy.locations[0:]).mean,
+        solutionnoisy.states[0:].mean,
         atol=1e-14,
         rtol=1e-14,
     )
