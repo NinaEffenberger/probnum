@@ -9,11 +9,10 @@ from probnum.diffeq import odesolution, wrappedscipyodesolution, wrappedscipysol
 
 
 @pytest_cases.fixture
-@pytest_cases.parametrize_with_cases("solvers", cases=".test_wrappedscipy_cases")
-# Workaround: usually the input of this would be "testsolver, scipysolver" instead of "solvers"
-# see issue https://github.com/smarie/python-pytest-cases/issues/202
-def solvers(solvers):
-    testsolver, scipysolver = solvers
+@pytest_cases.parametrize_with_cases(
+    "testsolver, scipysolver", cases=".test_wrappedscipy_cases"
+)
+def solvers(testsolver, scipysolver):
     return testsolver, scipysolver
 
 
@@ -73,7 +72,7 @@ def test_step_execution(solvers):
     scipysolver.step()
 
     # perform step of the same size
-    random_var, error_est = testsolver.step(
+    random_var, error_est, _ = testsolver.step(
         scipysolver.t_old,
         scipysolver.t,
         randvars.Constant(scipysolver.y_old),
@@ -83,7 +82,7 @@ def test_step_execution(solvers):
 
 def test_step_variables(solvers, y, start_point, stop_point):
     testsolver, scipysolver = solvers
-    solver_y_new, solver_error_estimation = testsolver.step(
+    solver_y_new, solver_error_estimation, _ = testsolver.step(
         start_point, stop_point, randvars.Constant(y)
     )
     y_new, f_new = rk.rk_step(
